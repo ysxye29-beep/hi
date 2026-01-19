@@ -352,4 +352,10 @@ export const FlashcardPage: React.FC<FlashcardPageProps> = ({
                                 <div key={s.sentence} className={`group bg-gray-900 hover:bg-gray-800 border ${isMastered ? 'border-emerald-900/50 hover:border-emerald-500/30' : 'border-gray-800 hover:border-gray-600'} rounded-2xl p-5 transition-all duration-300 cursor-pointer relative flex flex-col h-full`} onClick={() => onSelectSentence(s)}>
                                     <div className="flex justify-between items-start mb-3"><h3 className={`text-lg font-bold transition-colors truncate pr-2 ${isMastered ? 'text-emerald-400' : 'text-white'}`}>{s.sentence}</h3><div className="flex items-center gap-2"><button onClick={(e) => { e.stopPropagation(); onRemoveSentence(s.sentence); }} className="text-gray-600 hover:text-red-400 p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all"><Trash2 size={16} /></button></div></div>
                                     <p className="text-gray-400 text-sm line-clamp-2 mb-4 flex-grow font-medium">{s.meaning_vi}</p>
-                                    <div className="flex i
+                                    <div className="flex items-center">
+                                     {/* Nội dung bên trong */}
+                                   </div>
+                                </div>
+                               )
+                           );
+                         }
