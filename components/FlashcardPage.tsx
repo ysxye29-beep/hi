@@ -356,6 +356,18 @@ export const FlashcardPage: React.FC<FlashcardPageProps> = ({
                                      {/* Nội dung bên trong */}
                                    </div>
                                 </div>
-                               )
-                           );
-                         }
+                            )
+      );
+        })}
+        {/* Kết thúc vòng lặp map */}
+
+      </div> 
+      {/* Đóng thẻ div space-y-4 */}
+      
+    )} 
+    {/* QUAN TRỌNG: Đóng điều kiện sentences.length > 0 && ( */}
+
+    </div> 
+    {/* Đóng thẻ div bao quanh ngoài cùng */}
+  );
+}
