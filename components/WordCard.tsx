@@ -1,7 +1,7 @@
 
-import React, { useState, useRef, useEffect } from 'react';
-import { WordData, PronunciationFeedback } from '../types';
-import { Volume2, Bookmark, Mic, MicOff, RefreshCw, Star, AlertTriangle, Book, Cloud } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { WordData } from '../types';
+import { Volume2, Bookmark, Mic, MicOff, RefreshCw, Cloud } from 'lucide-react';
 import { checkPronunciation } from '../services/geminiService';
 
 interface WordCardProps {
@@ -76,7 +76,7 @@ export const WordCard: React.FC<WordCardProps> = ({ data, isSaved, onToggleSave,
       recorder.start();
       setIsRecording(true);
       setTimeout(() => { if (recorder.state === 'recording') stopRecording(); }, 3000);
-    } catch (err) { alert("Cần quyền Micro!"); }
+    } catch (err) { alert("Micro!"); }
   };
 
   const stopRecording = () => {
@@ -87,13 +87,13 @@ export const WordCard: React.FC<WordCardProps> = ({ data, isSaved, onToggleSave,
   };
 
   return (
-    <div className="bg-gray-800/95 sm:rounded-2xl shadow-xl border border-gray-700/80 overflow-hidden w-full max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300">
-      {/* Header Compact */}
-      <div className="bg-gray-750 p-3 sm:p-4 border-b border-gray-700 flex justify-between items-center gap-2">
+    <div className="bg-gray-850/95 sm:rounded-2xl shadow-2xl border border-gray-700/80 overflow-hidden w-full max-w-2xl mx-auto animate-in fade-in slide-in-from-bottom-2 duration-300">
+      {/* Header gọn gàng */}
+      <div className="bg-gray-800 p-3 sm:p-4 border-b border-gray-700 flex justify-between items-center gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
             <h1 className="text-xl sm:text-2xl font-black text-white leading-tight tracking-tight">{data.word}</h1>
-            <span className="text-[9px] font-mono text-yellow-300 bg-gray-900 px-1.5 py-0.5 rounded border border-gray-700">/{data.ipa}/</span>
+            <span className="text-[9px] font-mono text-yellow-300 bg-gray-950 px-1.5 py-0.5 rounded border border-gray-700">/{data.ipa}/</span>
           </div>
           <p className="text-base sm:text-lg text-emerald-400 font-bold mt-0.5 truncate leading-none">{data.meaning_vi}</p>
         </div>
@@ -105,9 +105,9 @@ export const WordCard: React.FC<WordCardProps> = ({ data, isSaved, onToggleSave,
         </div>
       </div>
 
-      <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
-        {/* Definition */}
-        <div className="bg-gray-900/40 p-2.5 rounded-lg border border-gray-700/50">
+      <div className="p-3 sm:p-4 space-y-3 sm:space-y-4 max-h-[70vh] overflow-y-auto custom-scrollbar">
+        {/* Definition Anh-Anh */}
+        <div className="bg-gray-950/40 p-2.5 rounded-lg border border-gray-700/50">
            <ClickableText text={`"${data.definition_en}"`} onLookup={onLookup} className="text-[11px] sm:text-xs text-gray-400 italic font-medium leading-tight block" />
         </div>
 
@@ -123,7 +123,7 @@ export const WordCard: React.FC<WordCardProps> = ({ data, isSaved, onToggleSave,
            </div>
         </div>
 
-        {/* Ví dụ */}
+        {/* Ví dụ thông minh */}
         <div className="space-y-2">
           <div className="bg-gray-900/50 p-2.5 rounded-lg border-l-2 border-emerald-500/60">
             <span className="text-[7px] font-black text-gray-500 uppercase tracking-widest mb-0.5 block">Ví dụ (B1)</span>
@@ -137,22 +137,22 @@ export const WordCard: React.FC<WordCardProps> = ({ data, isSaved, onToggleSave,
           </div>
         </div>
 
-        {/* Từ gốc & Mẹo nhớ */}
+        {/* Từ gốc & Ghi nhớ */}
         <div className="grid grid-cols-2 gap-2">
-          <div className="bg-gray-750/30 p-2 rounded-lg border border-gray-700">
+          <div className="bg-gray-800/30 p-2 rounded-lg border border-gray-700">
             <span className="text-[7px] text-gray-500 font-black uppercase mb-0.5 block">Từ gốc</span>
             <ClickableText text={data.root_word} onLookup={onLookup} className="text-[10px] text-emerald-400 font-extrabold" />
           </div>
-          <div className="bg-gray-750/30 p-2 rounded-lg border border-gray-700">
+          <div className="bg-gray-800/30 p-2 rounded-lg border border-gray-700">
             <span className="text-[7px] text-gray-500 font-black uppercase mb-0.5 block">Mẹo nhớ</span>
             <ClickableText text={data.mnemonic} onLookup={onLookup} className="text-[9px] text-gray-300 italic line-clamp-2" />
           </div>
         </div>
 
-        {/* Phân biệt Đồng nghĩa - Trái nghĩa */}
-        <div className="pt-1 space-y-2">
-          <div className="flex flex-col gap-1">
-            <span className="text-[7px] font-black text-emerald-500 uppercase tracking-[0.2em] border-b border-emerald-500/10 pb-0.5 w-fit">Đồng nghĩa</span>
+        {/* Phân biệt Đồng nghĩa - Trái nghĩa (QUAN TRỌNG) */}
+        <div className="pt-1 space-y-3">
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[7px] font-black text-emerald-500 uppercase tracking-[0.2em] border-b border-emerald-500/10 pb-0.5 w-fit">Đồng nghĩa (Synonyms)</span>
             <div className="flex flex-wrap gap-1">
               {data.synonyms.map((s, idx) => (
                 <button key={idx} onClick={() => onLookup?.(s.replace(/[.,]/g, "").trim())} className="px-1.5 py-0.5 bg-gray-900 border border-emerald-500/20 rounded text-[9px] text-emerald-400 hover:bg-emerald-500 hover:text-gray-950 transition-all font-bold">
@@ -162,19 +162,19 @@ export const WordCard: React.FC<WordCardProps> = ({ data, isSaved, onToggleSave,
             </div>
           </div>
           
-          <div className="flex flex-col gap-1">
-            <span className="text-[7px] font-black text-red-400 uppercase tracking-[0.2em] border-b border-red-500/10 pb-0.5 w-fit">Trái nghĩa</span>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[7px] font-black text-red-400 uppercase tracking-[0.2em] border-b border-red-500/10 pb-0.5 w-fit">Trái nghĩa (Antonyms)</span>
             <div className="flex flex-wrap gap-1">
               {data.antonyms && data.antonyms.length > 0 ? data.antonyms.map((s, idx) => (
                 <button key={idx} onClick={() => onLookup?.(s.replace(/[.,]/g, "").trim())} className="px-1.5 py-0.5 bg-gray-900 border border-red-500/20 rounded text-[9px] text-red-400 hover:bg-red-500 hover:text-white transition-all font-bold">
                   {s}
                 </button>
-              )) : <span className="text-[8px] text-gray-700 italic px-1">Không có dữ liệu</span>}
+              )) : <span className="text-[8px] text-gray-700 italic px-1 opacity-50">N/A</span>}
             </div>
           </div>
 
-          <div className="flex flex-col gap-1">
-            <span className="text-[7px] font-black text-purple-400 uppercase tracking-[0.1em]">Collocations</span>
+          <div className="flex flex-col gap-1.5">
+            <span className="text-[7px] font-black text-purple-400 uppercase tracking-[0.2em] border-b border-purple-500/10 pb-0.5 w-fit">Collocations</span>
             <div className="flex flex-wrap gap-1">
               {data.collocations.slice(0, 3).map((s, idx) => (
                 <span key={idx} className="text-[9px] text-purple-300 font-bold bg-purple-950/20 px-1.5 py-0.5 rounded border border-purple-500/10">

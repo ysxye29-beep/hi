@@ -8,9 +8,9 @@ const sentenceCache = new Map<string, SentenceData>();
 const wordSchema = {
   type: Type.OBJECT,
   properties: {
-    word: { type: Type.STRING, description: "The English word (MUST BE EXACTLY SAME as input if input is English)" },
+    word: { type: Type.STRING, description: "The English word analyzed" },
     meaning_vi: { type: Type.STRING, description: "Main Vietnamese meaning" },
-    definition_en: { type: Type.STRING, description: "Short, simple English definition (max 15 words)" },
+    definition_en: { type: Type.STRING, description: "Short English definition" },
     ipa: { type: Type.STRING },
     syllables: { type: Type.STRING },
     spelling_tip: { type: Type.STRING },
@@ -19,8 +19,8 @@ const wordSchema = {
     example_vi: { type: Type.STRING },
     example_b2_en: { type: Type.STRING },
     example_b2_vi: { type: Type.STRING },
-    root_word: { type: Type.STRING, description: "The origin word or root of the word" },
-    mnemonic: { type: Type.STRING, description: "Memory trick to remember this word" },
+    root_word: { type: Type.STRING },
+    mnemonic: { type: Type.STRING },
     synonyms: { type: Type.ARRAY, items: { type: Type.STRING } },
     antonyms: { type: Type.ARRAY, items: { type: Type.STRING } },
     word_family: { type: Type.ARRAY, items: { type: Type.STRING } },
@@ -32,8 +32,8 @@ const wordSchema = {
 const sentenceSchema = {
   type: Type.OBJECT,
   properties: {
-    sentence: { type: Type.STRING, description: "The English version of the sentence" },
-    meaning_vi: { type: Type.STRING, description: "Vietnamese translation/original" },
+    sentence: { type: Type.STRING },
+    meaning_vi: { type: Type.STRING },
     grammar_breakdown: { type: Type.STRING },
     usage_context: { type: Type.STRING },
     naturalness_score: { type: Type.NUMBER },
@@ -51,35 +51,19 @@ const sentenceSchema = {
   required: ["sentence", "meaning_vi", "grammar_breakdown", "usage_context", "naturalness_score", "similar_sentences"]
 };
 
-const pronunciationSchema = {
-  type: Type.OBJECT,
-  properties: {
-    score: { type: Type.NUMBER },
-    is_correct: { type: Type.BOOLEAN },
-    feedback_vi: { type: Type.STRING },
-    detected_speech: { type: Type.STRING },
-  },
-  required: ["score", "is_correct", "feedback_vi", "detected_speech"],
-};
-
 export const lookupWord = async (input: string): Promise<WordData> => {
   const normalized = input.trim().toLowerCase();
   if (wordCache.has(normalized)) return wordCache.get(normalized)!;
 
+  // Luôn tạo instance mới ngay trước khi gọi để đảm bảo lấy đúng API key
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview", 
-    contents: `Analyze this English/Vietnamese word: "${normalized}"`,
+    contents: `Analyze this word: "${normalized}"`,
     config: {
-      systemInstruction: `You are an ultra-fast bilingual dictionary.
-      STRICT RULES:
-      1. If input is English, "word" field MUST match input exactly.
-      2. If input is Vietnamese, translate to the most precise English word first.
-      3. Distinguish clearly between synonyms and antonyms.
-      4. Speed is top priority. JSON output only.`,
+      systemInstruction: "You are an expert bilingual dictionary. Provide JSON only. Distinguish synonyms (matching meaning) and antonyms (opposite meaning) clearly.",
       responseMimeType: "application/json",
       responseSchema: wordSchema,
-      temperature: 0,
     },
   });
   
@@ -95,15 +79,11 @@ export const lookupSentence = async (input: string): Promise<SentenceData> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview", 
-    contents: `Analyze sentence: "${normalized}"`,
+    contents: `Analyze: "${normalized}"`,
     config: {
-      systemInstruction: `Analyze English/Vietnamese sentence. 
-      If Vietnamese, translate to natural English. 
-      The "sentence" field MUST be the English version. 
-      JSON only.`,
+      systemInstruction: "Analyze sentence and provide naturalness. JSON only.",
       responseMimeType: "application/json",
       responseSchema: sentenceSchema,
-      temperature: 0,
     },
   });
   
@@ -119,14 +99,12 @@ export const checkPronunciation = async (target: string, base64Audio: string, mi
     contents: {
       parts: [
         { inlineData: { data: base64Audio, mimeType: mimeType } },
-        { text: `Check pronunciation for: "${target}"` }
+        { text: `Feedback on pronunciation for: "${target}"` }
       ]
     },
     config: {
-      systemInstruction: "Pronunciation coach. Be brief. JSON output.",
+      systemInstruction: "Bilingual pronunciation coach. Be concise. JSON only.",
       responseMimeType: "application/json",
-      responseSchema: pronunciationSchema,
-      temperature: 0,
     }
   });
   return JSON.parse(response.text) as PronunciationFeedback;
